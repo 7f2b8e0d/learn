@@ -1,4 +1,14 @@
 // 在这里写 Pair、impl 和 same。
+struct Pair<T> {
+    left: T,
+    right: T
+}
+
+impl<T: PartialOrd> Pair<T> {
+    fn same(&self) -> bool {
+       self.left == self.right
+    }
+}
 
 #[cfg(test)]
 mod tests {

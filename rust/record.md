@@ -28,3 +28,4 @@
 | 22 | 按 trait 规定返回名字 | 题面给了 `&self.name`。问了 `&self.name` 是不是对 `name` 的引用、`&self` 是不是对 `self` 的引用。说明了 `self` 已是 `&Account`，`&self.name` 借的是字段。自己写完，测试通过。未代写，未让 AI 改代码。 |
 | 23 | 同一个函数接收两种类型 | 题面给了 `item.name()`。自己写成 `&item.name()`，测试通过。未提问，未代写，未让 AI 改代码。 |
 | 24 | 两个同类型的值 | 题面给了结构体、`impl<T>` 和 `&self.left`。自己填了方法体，测试通过。未提问，未代写，未让 AI 改代码。 |
+| 25 | 两个值是否相同 | 问了 `assert!` 的作用。结构自己写了。约束写成 `PartialOrd`，问了是不是不对。说明 `==` 要 `PartialEq`，`PartialOrd` 是比大小，它附带 `PartialEq` 所以测试仍通过。自己把 `if/else` 收成 `==`，约束仍是 `PartialOrd`。未代写，未让 AI 改代码。 |
