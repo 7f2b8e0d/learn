@@ -12,8 +12,7 @@ pub use state::*;
 declare_id!("9yK2ujmxmPs16s2fsE5bEWoovbVkCoRBEcMqvi95wiBa");
 
 #[derive(Accounts)]
-pub struct Hello {
-}
+pub struct Hello {}
 
 #[program]
 pub mod hello_world {
@@ -23,7 +22,6 @@ pub mod hello_world {
         msg!("Hello, world!");
         Ok(())
     }
-
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         crate::instructions::initialize::handle_initialize(ctx)
