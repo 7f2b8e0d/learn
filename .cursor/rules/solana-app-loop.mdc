@@ -5,7 +5,7 @@ alwaysApply: true
 
 # 出题
 
-原则：尽快、沿平滑曲线学会写 Solana 应用。合约用 Anchor 写，用 `anchor init` 建项目，不用 `cargo new`。网页客户端排在合约之后。只依据 `solana/record.md` 的相关信息出下一题。Rust 编程放在 `rust/`，不在这里出。
+原则：尽快、沿平滑曲线学会写 Solana 应用。合约用 Anchor 写，用 `anchor init 名字 --no-git` 建项目，不用 `cargo new`；外层 `learn` 已是 git 仓库，项目里不能再有 `.git`。网页客户端排在合约之后。只依据 `solana/record.md` 的相关信息出下一题。Rust 编程放在 `rust/`，不在这里出。
 
 ## 答题记录
 
