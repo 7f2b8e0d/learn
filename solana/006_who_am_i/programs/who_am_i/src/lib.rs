@@ -11,6 +11,11 @@ pub use state::*;
 
 declare_id!("2Mk2G2bsVsCzZeQhis2fzd2bDMTRoFNzwVYusNf1fE7X");
 
+#[derive(Accounts)]
+pub struct WhoAmI<'info> {
+    pub user: Signer<'info>,
+}
+
 #[program]
 pub mod who_am_i {
     use super::*;
@@ -21,5 +26,10 @@ pub mod who_am_i {
 
     pub fn increment(ctx: Context<Increment>) -> Result<()> {
         crate::instructions::increment::handle_increment(ctx)
+    }
+
+    pub fn whoami(ctx: Context<WhoAmI>) -> Result<()> {
+        msg!("user: {}", ctx.accounts.user.key());
+        Ok(())
     }
 }
