@@ -10,4 +10,4 @@ pub const HELLO_WORLD_LAMPORTS: u64 = 1;
 pub const MAX_COUNT: u64 = 10;
 
 #[constant]
-pub const VAULT_SEED = b"vault";
+pub const VAULT_SEED: &[u8] = b"vault";

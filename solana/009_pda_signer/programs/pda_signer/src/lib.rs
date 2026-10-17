@@ -11,22 +11,20 @@ pub use state::*;
 
 declare_id!("CSUPLwoRrWPKrLgdvCg2Uw4HFFrsc79BkmKjG37HHr8Q");
 
-#[dervie(Accounts)]
-pub struct Withdraw {
+#[derive(Accounts)]
+pub struct Withdraw<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
-    
+
     #[account(
         mut,
-        payer = author,
-        space = 8 + Note::INIT_SPACE,
         seeds = [VAULT_SEED, user.key().as_ref()],
         bump
     )]
     pub vault: SystemAccount<'info>,
-    
+
     #[account(mut)]
-    pub recipient:SystemAccount<'info>,
+    pub recipient: SystemAccount<'info>,
 
     pub system_program: Program<'info, System>,
 }
@@ -43,12 +41,21 @@ pub mod pda_signer {
         crate::instructions::increment::handle_increment(ctx)
     }
 
-    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> {
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         let cpi_accounts = anchor_lang::system_program::Transfer {
-            from: ctx.accounts.from.to_account_info(),
-            to: ctx.accounts.to.to_account_info(),
+            from: ctx.accounts.vault.to_account_info(),
+            to: ctx.accounts.recipient.to_account_info(),
         };
-        let cpi_ctx = CpiContext::new(anchor_lang::system_program::ID, cpi_accounts);
+
+        let user_key = ctx.accounts.user.key();
+        let bump = ctx.bumps.vault;
+        let signer_seeds: &[&[u8]] = &[VAULT_SEED, user_key.as_ref(), &[bump]];
+        let signers = [signer_seeds];
+        let cpi_ctx = CpiContext::new_with_signer(
+            anchor_lang::system_program::ID,
+            cpi_accounts,
+            &signers,
+        );
         anchor_lang::system_program::transfer(cpi_ctx, amount)?;
         msg!("transferred: {}", amount);
         Ok(())
