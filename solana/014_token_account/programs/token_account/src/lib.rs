@@ -8,8 +8,41 @@ use anchor_lang::prelude::*;
 pub use constants::*;
 pub use instructions::*;
 pub use state::*;
+use anchor_spl::token::{Mint, Token, TokenAccount};
 
 declare_id!("D2hPziVX4o567uthRVN3iCvwFZoud8UQpR6aZfQArWFQ");
+
+#[derive(Accounts)]
+pub struct CreateTokenAccount<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    pub mint: Account<'info, Mint>,
+
+    #[account(
+        init,
+        payer = payer,
+        token::mint = mint,
+        token::authority = payer,
+    )]
+    pub token_account: Account<'info, TokenAccount>,
+    token_program: Program<'info, Token>,
+    system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct CreateMint<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    #[account(
+        init,
+        payer = payer,
+        mint::decimals = 9,
+        mint::authority = payer,
+    )]
+    pub mint: Account<'info, Mint>,
+    token_program: Program<'info, Token>,
+    system_program: Program<'info, System>,
+}
 
 #[program]
 pub mod token_account {
@@ -21,5 +54,13 @@ pub mod token_account {
 
     pub fn increment(ctx: Context<Increment>) -> Result<()> {
         crate::instructions::increment::handle_increment(ctx)
+    }
+
+    pub fn create_mint(_ctx: Context<CreateMint>) -> Result<()> {
+        Ok(())
+    }
+
+    pub fn create_token_account(_ctx: Context<CreateTokenAccount>) -> Result<()> {
+        Ok(())
     }
 }
