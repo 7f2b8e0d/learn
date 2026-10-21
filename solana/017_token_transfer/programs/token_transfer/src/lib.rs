@@ -10,19 +10,19 @@ pub use instructions::*;
 pub use state::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
 
-declare_id!("EGmezehUC6C492T2oszcmoJGNBLx7cbqBBho25v8fHez");
+declare_id!("F6AiTLrLkTJrrTW5J5mEBVHg8bBvb5VXi5We1Zc4vJ1K");
 
 #[derive(Accounts)]
 pub struct CreateTokenAccount<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     pub mint: Account<'info, Mint>,
-
+    pub owner: Signer<'info>,
     #[account(
         init,
         payer = payer,
         token::mint = mint,
-        token::authority = payer,
+        token::authority = owner,
     )]
     pub token_account: Account<'info, TokenAccount>,
     token_program: Program<'info, Token>,
@@ -92,6 +92,21 @@ pub mod token_account {
                     mint: ctx.accounts.mint.to_account_info(),
                     to: ctx.accounts.token_account.to_account_info(),
                     authority: ctx.accounts.payer.to_account_info(),
+                },
+            ),
+            amount,
+        )?;
+        Ok(())
+    }
+
+    pub fn transfer(ctx: Context<Transfer>, amount: u64) -> Result<()> {
+        anchor_spl::token::transfer(
+            CpiContext::new(
+                ctx.accounts.token_program.key(),
+                anchor_spl::token::Transfer {
+                    from: ctx.accounts.from.to_account_info(),
+                    to: ctx.accounts.to.to_account_info(),
+                    authority: ctx.accounts.authority.to_account_info(),
                 },
             ),
             amount,

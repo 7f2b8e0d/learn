@@ -20,3 +20,4 @@
 | 14 | 给 `payer` 建一个持币账户 | 问过：已有的 `Mint` 不写 `init` 是不是调用别的合约。`CreateTokenAccount` 的 `mint` 误加了 `payer` 约束，指出后自己删。第二笔交易少签持币账户，报 `NotEnoughSigners`，指出后自己加上。问过账户还不存在为何能签名。通过时主人是 `payer`，余额 0，`mint` 对应该 `Mint`。未代写，未让 AI 改代码。 |
 | 15 | 往持币账户里增发 `100` | 问过：`key()` 是公钥、`key` 与 `pubkey` 的差别、`anchor_spl::token::mint_to` 是调用 Token 程序。给过 `mint_to` 函数体的完整写法。程序模块仍叫 `token_account`。测试自己写。中途第二笔交易报过 `NotEnoughSigners`。通过时持币账户 `amount` 为 100。未代写测试，未让 AI 改代码。 |
 | 16 | 连续增发 `100` 和 `40` | 程序对照第 15 题自己抄。测试自己写。通过时持币账户 `amount` 为 140。未核对 `Mint` 的 `supply`。未代写，未让 AI 改代码。 |
+| 17 | 从 `payer` 的持币账户转 `30` 给 Alice | 问过 `transfer` 要不要带 `mint`、带小数核对是什么。`transfer` 函数体给过完整写法（去掉 `mint`，补上逗号）。`CreateTokenAccount` 给过带 `owner` 的完整示例。问过怎样只打印日志，提示用 `pretty_logs()`。测试曾把 `token_account` 写成 `payer`（4101），又把 Alice 的钱包地址当成持币账户；指出后自己改成单独的 `alice_token`，三方签名。问过钱包和持币账户地址一样会怎样。新建持币账户的 `airdrop` 按提示注释掉。通过时两边余额 `70` 和 `30`。未代写文件，未让 AI 改代码。随后的「Alice 把 `10` 转回给 payer」本人认为与本题重复，要求跳过，未做。 |

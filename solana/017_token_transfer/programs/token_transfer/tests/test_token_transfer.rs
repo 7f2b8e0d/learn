@@ -1,3 +1,4 @@
+use anchor_spl::token::TokenAccount;
 use {
     anchor_lang::{
         solana_program::{instruction::Instruction, system_program},
@@ -10,7 +11,6 @@ use {
     solana_signer::Signer,
     solana_transaction::versioned::VersionedTransaction,
 };
-use anchor_spl::token::TokenAccount;
 
 #[test]
 fn test_token_transfer() {
@@ -39,7 +39,8 @@ fn test_token_transfer() {
 
     let blockhash = svm.latest_blockhash();
     let msg = Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
-    let tx = VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer, &mint]).unwrap();
+    let tx =
+        VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer, &mint]).unwrap();
 
     let res = svm.send_transaction(tx);
     assert!(res.is_ok());
@@ -57,7 +58,7 @@ fn test_token_transfer() {
     assert_eq!(mint_state.mint_authority.unwrap(), payer.pubkey());
 
     let token_account = Keypair::new();
-    svm.airdrop(&token_account.pubkey(), 1_000_000_000).unwrap();
+    // svm.airdrop(&token_account.pubkey(), 1_000_000_000).unwrap();
 
     let instruction = Instruction::new_with_bytes(
         program_id,
@@ -65,6 +66,7 @@ fn test_token_transfer() {
         token_transfer::accounts::CreateTokenAccount {
             payer: payer.pubkey(),
             mint: mint.pubkey(),
+            owner: payer.pubkey(),
             token_account: token_account.pubkey(),
             token_program: token::ID,
             system_program: system_program::ID,
@@ -74,23 +76,52 @@ fn test_token_transfer() {
 
     let blockhash = svm.latest_blockhash();
     let msg = Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
-    let tx = VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer, &token_account]).unwrap();
+    let tx =
+        VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer, &token_account])
+            .unwrap();
+
+    let res = svm.send_transaction(tx);
+    println!("e");
+    assert!(res.is_ok());
+    println!("d");
+
+    //alice
+    let alice = Keypair::new();
+    let alice_token = Keypair::new();
+    let instruction = Instruction::new_with_bytes(
+        program_id,
+        &token_transfer::instruction::CreateTokenAccount {}.data(),
+        token_transfer::accounts::CreateTokenAccount {
+            payer: payer.pubkey(),
+            mint: mint.pubkey(),
+            owner: alice.pubkey(),
+            token_account: alice_token.pubkey(),
+            token_program: token::ID,
+            system_program: system_program::ID,
+        }
+        .to_account_metas(None),
+    );
+
+    let blockhash = svm.latest_blockhash();
+    let msg = Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
+    let tx =
+        VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer, &alice, &alice_token]).unwrap();
 
     let res = svm.send_transaction(tx);
     assert!(res.is_ok());
 
     //获取代币相关数据
-    let account = svm.get_account(&token_account.pubkey()).unwrap();
+    let account = svm.get_account(&alice_token.pubkey()).unwrap();
     let mut data: &[u8] = &account.data;
     let token_account_state = TokenAccount::try_deserialize(&mut data).unwrap();
 
-    assert_eq!(token_account_state.owner, payer.pubkey());
+    assert_eq!(token_account_state.owner, alice.pubkey());
     assert_eq!(token_account_state.amount, 0);
     assert_eq!(token_account_state.mint, mint.pubkey());
 
-     let instruction = Instruction::new_with_bytes(
+    let instruction = Instruction::new_with_bytes(
         program_id,
-        &token_transfer::instruction::MintTo {amount: 100}.data(),
+        &token_transfer::instruction::MintTo { amount: 100 }.data(),
         token_transfer::accounts::MintTo {
             payer: payer.pubkey(),
             mint: mint.pubkey(),
@@ -107,13 +138,13 @@ fn test_token_transfer() {
     let res = svm.send_transaction(tx);
     assert!(res.is_ok());
 
-     let instruction = Instruction::new_with_bytes(
+    let instruction = Instruction::new_with_bytes(
         program_id,
-        &token_transfer::instruction::MintTo {amount: 40}.data(),
-        token_transfer::accounts::MintTo {
-            payer: payer.pubkey(),
-            mint: mint.pubkey(),
-            token_account: token_account.pubkey(),
+        &token_transfer::instruction::Transfer { amount: 30 }.data(),
+        token_transfer::accounts::Transfer {
+            from: token_account.pubkey(),
+            to: alice_token.pubkey(),
+            authority: payer.pubkey(),
             token_program: token::ID,
         }
         .to_account_metas(None),
@@ -124,12 +155,17 @@ fn test_token_transfer() {
     let tx = VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer]).unwrap();
 
     let res = svm.send_transaction(tx);
+    let meta = res.clone().unwrap();
+    println!("{}", meta.pretty_logs());
     assert!(res.is_ok());
 
     //获取代币相关数据
     let account = svm.get_account(&token_account.pubkey()).unwrap();
     let mut data: &[u8] = &account.data;
-    let token_account_state = TokenAccount::try_deserialize(&mut data).unwrap();
-
-    assert_eq!(token_account_state.amount, 140);
+    let payer_account_state = TokenAccount::try_deserialize(&mut data).unwrap();
+    assert_eq!(payer_account_state.amount, 70);
+    let account = svm.get_account(&alice_token.pubkey()).unwrap();
+    let mut data: &[u8] = &account.data;
+    let alice_account_state = TokenAccount::try_deserialize(&mut data).unwrap();
+    assert_eq!(alice_account_state.amount, 30);
 }
