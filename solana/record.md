@@ -18,3 +18,5 @@
 | 12 | 创建一种代币（`Mint`，小数位数 9） | 问过：租金、持币账户存在哪、怎样从外部查余额、持币账户里的 SOL 谁持有、`payer` 是不是代币拥有者、为何要带 `token_program`、`token` 从哪导入。`idl-build` 缺 `anchor-spl/idl-build`，指出后自己加。函数名曾写成 `create_mini`。约束写法给过。测试给过完整写法，自己改过导入。通过时 `decimals` 为 9，`supply` 为 0，铸币权限是 `payer`。未代写合约文件，未让 AI 改代码。 |
 | 13 | 铸币权限换成另一个签名者 | 问过：铸币权限为何要签名。说明 `Signer` 是这题的要求，Token 程序只把地址写入 `Mint`。合约和测试对照第 12 题自己改。通过时铸币权限是 `authority`，不是 `payer`。未代写，未让 AI 改代码。 |
 | 14 | 给 `payer` 建一个持币账户 | 问过：已有的 `Mint` 不写 `init` 是不是调用别的合约。`CreateTokenAccount` 的 `mint` 误加了 `payer` 约束，指出后自己删。第二笔交易少签持币账户，报 `NotEnoughSigners`，指出后自己加上。问过账户还不存在为何能签名。通过时主人是 `payer`，余额 0，`mint` 对应该 `Mint`。未代写，未让 AI 改代码。 |
+| 15 | 往持币账户里增发 `100` | 问过：`key()` 是公钥、`key` 与 `pubkey` 的差别、`anchor_spl::token::mint_to` 是调用 Token 程序。给过 `mint_to` 函数体的完整写法。程序模块仍叫 `token_account`。测试自己写。中途第二笔交易报过 `NotEnoughSigners`。通过时持币账户 `amount` 为 100。未代写测试，未让 AI 改代码。 |
+| 16 | 连续增发 `100` 和 `40` | 程序对照第 15 题自己抄。测试自己写。通过时持币账户 `amount` 为 140。未核对 `Mint` 的 `supply`。未代写，未让 AI 改代码。 |

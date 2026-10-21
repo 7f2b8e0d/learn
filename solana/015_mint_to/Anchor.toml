@@ -1,0 +1,19 @@
+skip_local_validator = true
+
+[toolchain]
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+mint_to = "3PHnofateLWtFU1nw8M7CZRmK5dFu3wFKEeS1Z9r1aPB"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test"
+
+[hooks]

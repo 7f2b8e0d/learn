@@ -1,0 +1,19 @@
+skip_local_validator = true
+
+[toolchain]
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+token_transfer = "EGmezehUC6C492T2oszcmoJGNBLx7cbqBBho25v8fHez"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test"
+
+[hooks]
